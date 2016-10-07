@@ -1,0 +1,57 @@
+{
+    "cmd": null,
+    "constraints": [],
+    "container": {
+        "docker": {
+            "forcePullImage": false,
+            "image": "122972921717.dkr.ecr.us-west-2.amazonaws.com/helloapp:latest",
+            "network": "BRIDGE",
+            "parameters": [],
+            "portMappings": [
+                {
+                    "containerPort": 5000,
+                    "hostPort": 0,
+                    "labels": {},
+                    "protocol": "tcp",
+                    "servicePort": 10002
+                }
+            ],
+            "privileged": false
+        },
+        "env": {
+          "ENVIRONMENT": "test"
+        },
+        "type": "DOCKER",
+        "volumes": []
+    },
+    "cpus": 0.1,
+    "disk": 128,
+    "healthChecks": [
+        {
+          "path": "/",
+          "protocol": "HTTP",
+          "portIndex": 0,
+          "gracePeriodSeconds": 300,
+          "intervalSeconds": 30,
+          "timeoutSeconds": 5,
+          "maxConsecutiveFailures": 2,
+          "ignoreHttp1xx": false
+        }
+    ],
+    "id": "/zap/helloapp",
+    "instances": 3,
+    "labels": {
+        "application": "helloapp",
+        "environment": "stage",
+        "pod": "zap",
+        "HAPROXY_GROUP": "external"
+    },
+    "mem": 32,
+    "upgradeStrategy": {
+        "minimumHealthCapacity": 0.5,
+        "maximumOverCapacity": 0.5
+    },
+    "uris": [
+        "/etc/docker-login/122972921717.tar.gz"
+    ]
+}

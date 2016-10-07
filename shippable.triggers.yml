@@ -1,0 +1,13 @@
+triggers:
+  - name: trigger-deploy-test
+    type: trigger
+    version:
+      message: 'testing trigger in test - 10'
+    flags:
+      - helloapp
+  - name: trigger-deploy-prod
+    type: trigger
+    version:
+      message: 'testing trigger in prod - github.7'
+    flags:
+      - helloapp

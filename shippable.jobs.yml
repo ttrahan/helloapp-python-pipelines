@@ -1,0 +1,93 @@
+jobs:
+
+# jobs for pipelines from CI thru PROD environment
+
+################################
+
+# generate manifest
+  - name: helloapp-man
+    type: manifest
+    steps:
+      - IN: helloapp-img
+        #versionNumber: 1
+      - IN: helloapp-params-test
+      - IN: helloapp-img-opts-test
+      - IN: trigger-deploy-test
+      - TASK: managed
+    flags:
+      - helloapp
+
+# deploy to Marathon TEST environment
+  - name: helloapp-deploy-test
+    type: runSh
+    steps:
+      - IN: helloapp-man
+      - IN: helloapp-scripts
+      - TASK:
+        - script: . IN/helloapp-scripts/gitRepo/deploy-test.sh
+        - script: cp IN/helloapp-man/manifestSteps/manifests.json state/manifests-test.json
+    on_success:
+      - NOTIFY: slack
+    on_failure:
+      - NOTIFY: slack
+    flags:
+      - helloapp
+
+# deploy to Marathon PROD environment
+  - name: helloapp-deploy-prod
+    type: runSh
+    steps:
+      - IN: helloapp-deploy-test
+        switch: off
+      - IN: helloapp-params-prod
+      - IN: helloapp-img-opts-prod
+      - IN: helloapp-scripts
+      - TASK:
+        - script: . IN/helloapp-scripts/gitRepo/deploy-prod.sh
+        - script: cp IN/helloapp-scripts/gitRepo/marathon.json state/marathon-prod.json
+    on_success:
+      - NOTIFY: slack
+    on_failure:
+      - NOTIFY: slack
+    flags:
+      - helloapp
+
+# # increment release version
+#   - name: helloapp-rel
+#     type: release
+#     steps:
+#       - IN: helloapp-ver
+#       - IN: helloapp-test-ecs
+#         trigger: true
+#       - TASK: managed
+#         bump: patch
+
+# TEST deployment to Amazon ECS
+  - name: helloapp-test-ecs
+    type: deploy
+    steps:
+      - IN: helloapp-man
+      - IN: helloapp-env-test-ecs
+      - IN: helloapp-params-test
+        applyTo: helloapp-img
+      - TASK: managed
+    flags:
+      - helloapp
+
+# PROD deployment - Amazon ECS
+  - name: helloapp-prod-ecs
+    type: deploy
+    steps:
+      # - IN: demo-rel
+      #   trigger: false
+      #   versionName: v1.0.2
+      - IN: helloapp-test-ecs
+        switch: off
+      - IN: helloapp-env-prod-ecs
+      - IN: helloapp-params-prod
+        applyTo: helloapp-img
+      - IN: helloapp-scaler-prod
+      - IN: trigger-deploy-prod
+      - TASK: managed
+    flags:
+      - helloapp

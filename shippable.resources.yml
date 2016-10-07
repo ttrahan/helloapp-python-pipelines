@@ -1,0 +1,103 @@
+resources:
+
+# pipeline resources from CI thru TEST environment
+
+################################
+
+# shared resources
+
+# Docker Image
+  - name: helloapp-img
+    type: image
+    integration: ttrahan-dh
+    pointer:
+      sourceName: ttrahan/helloapp-python
+      isPull: false
+    seed:
+      versionName: master.1
+    flags:
+      - helloapp-python
+
+# # set application version seed
+#   - name: helloapp-ver
+#     type: version
+#     seed:
+#       versionName: "1.0.0"
+#     flags:
+#       - helloapp-python
+
+# gitRepo for runSh scripts
+  - name: helloapp-scripts
+    type: gitRepo
+    integration: ttrahan-gh
+    pointer:
+      sourceName: ttrahan/helloapp-python-pipelines
+      branch: master
+
+################################
+
+# TEST environment resources
+
+# Docker Image Options for helloapp-python TEST environment
+  - name: helloapp-img-opts-test
+    type: dockerOptions
+    version:
+      memory: 128
+      cpuShares: 256
+      portMappings:
+        - 5000:5000
+      publishAllPorts : true
+    flags:
+      - helloapp-python
+
+# env vars for helloapp-python TEST environment
+  - name: helloapp-params-test
+    type: params
+    version:
+      params:
+        ENVIRONMENT: "test"
+        MARATHON_HOST: "https://marathon-test.shippable.io"
+        MESOS_APP_NAME: "/helloapp"
+        MARATHON_APP_FILE: "marathon.json"
+    flags:
+      - helloapp-python
+
+################################
+
+# PROD environment resources
+
+# PROD replica controller
+  - name: helloapp-scaler-prod
+    type: replicas
+    version:
+      count: 2
+    flags:
+      - helloapp-python
+
+# Docker Image Options for helloapp
+  - name: helloapp-img-opts-prod
+    type: dockerOptions
+    version:
+      memory: 256
+      cpuShares: 512
+    flags:
+      - helloapp-python
+
+# env vars for helloapp
+  - name: helloapp-params-prod
+    type: params
+    version:
+      params:
+        ENVIRONMENT: "PROD"
+        MARATHON_HOST: "https://marathon-prod.shippable.io"
+    flags:
+      - helloapp-python
+
+################################
+# slack integration
+  - name: slackNotification
+    type: notification
+    integration: slack
+    pointer:
+      recipients:
+        - "#demo"
