@@ -1,5 +1,5 @@
 ## Pipeline Workflow
-This Hello App will do the following to demonstrate the workflow of the Build Services POC
+This repo contains pipeline configuration for a [Hello World python app](https://github.com/ttrahan/helloapp-python) for the following workflow:
 
 ```gherkin
 Feature: CI/CD workflow
@@ -9,7 +9,7 @@ Feature: CI/CD workflow
       And GitHub for source control
       And Docker Hub for docker images
       And deploying into two environments, TEST and PROD
-        And these environments use DC/OS with Marathon for orchestrating containers
+        And these environments use DC/OS with Marathon for scheduling containers
       And uses Slack for internal communication
 
   Scenario: run build/CI on sample python app
