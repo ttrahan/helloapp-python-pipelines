@@ -7,6 +7,21 @@ sudo apt-get update
 echo -e "\n*** installing jq ***"
 sudo apt-get install jq
 
+# 2a. Extract previous state for job
+echo -e "\n*** extracting previous state for this job ***"
+get_previous_state() {
+  local previous_statefile_location="/build/previousState/marathon-previous-prod.json"
+  local previous_statefile_copyTo="/build/IN/helloapp-scripts-repo/gitRepo"
+  if [ -f "$previous_statefile_location" ]; then
+    # process previous statefile
+    cp $previous_statefile_location $previous_statefile_copyTo
+    echo 'restored previous statefile'
+  else
+    echo "no previous statefile exists"
+  fi
+}
+get_previous_state
+
 # 2. Extract state from inputs to the runSh job that calls this script
 echo -e "\n*** extracting manifest and params information ***"
 PARAMS_FILE=IN/helloapp-params-prod/version.json
@@ -56,5 +71,13 @@ else
   exit 1
 fi
 
-# 5. Finish processing this script
-echo -e "\n*** processing complete - deploy-prod.sh  ***"
+# 5. Save state
+echo -e "\n*** saving state ***"
+createOutState() {
+  STATEFILE_LOCATION=/build/state/
+  cp marathon.json $STATEFILE_LOCATION/marathon-previous-prod.json
+}
+createOutState
+
+# 6. Finish processing this script
+echo -e "\n*** processing complete - ${BASH_SOURCE[0]}  ***"

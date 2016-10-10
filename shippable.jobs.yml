@@ -22,7 +22,7 @@ jobs:
     type: runSh
     steps:
       - IN: helloapp-man
-      - IN: helloapp-scripts
+      - IN: helloapp-scripts-repo
       - TASK:
         - script: . IN/helloapp-scripts/gitRepo/deploy-test.sh
         - script: cp IN/helloapp-man/manifestSteps/manifests.json state/manifests-test.json

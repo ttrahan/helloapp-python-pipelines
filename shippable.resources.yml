@@ -27,7 +27,7 @@ resources:
 #       - helloapp-python
 
 # gitRepo for runSh scripts
-  - name: helloapp-scripts
+  - name: helloapp-scripts-repo
     type: gitRepo
     integration: ttrahan-gh
     pointer:
